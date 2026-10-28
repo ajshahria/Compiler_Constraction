@@ -1,0 +1,2 @@
+char grade = 'A';
+int x = grade + 5;
