@@ -28,15 +28,15 @@ PHASES = [
 SAMPLE = """#include <iostream>
 using namespace std;
 
-int x;
-int y;
-x = 10;
-y = 0;
-while (x > 0) {
-    y = y + x;
-    x = x - 1;
+int main() {
+    int x = 10, y = 0;
+    while (x > 0) {
+        y = y + x;
+        x = x - 1;
+    }
+    cout << "Sum: " << y << endl;
+    return 0;
 }
-cout << y << endl;
 """
 
 

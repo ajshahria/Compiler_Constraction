@@ -99,6 +99,10 @@ int x = 1;
 #include <vector>
 print x;
 """),
+    ("6d. Missing main()", "nomain", """#include <iostream>
+int x = 1;
+cout << x;
+"""),
     ("7. Syntax errors", "error", """int x;
 x = 5
 print x;
@@ -122,6 +126,18 @@ PHASES = [("Headers", "--headers"), ("Tokens", "--tokens"), ("AST", "--ast"),
           ("Assembly", "--asm"), ("Output", "--run")]
 
 
+def wrap_in_main(src):
+    """Put everything after the leading #include/using lines inside 'int main() { ... }'."""
+    head, body = [], []
+    for line in src.splitlines():
+        if not body and (line.startswith("#include") or line.startswith("using namespace") or not line.strip()):
+            head.append(line)
+        else:
+            body.append(line)
+    nl = chr(10)
+    return nl.join(head + ["int main() {"] + ["    " + l for l in body] + ["    return 0;", "}"]) + nl
+
+
 def run(flag, path):
     r = subprocess.run([EXE, flag, path], input="", capture_output=True, text=True, timeout=20)
     out = "\n".join(l for l in r.stdout.splitlines() if not l.startswith("==="))
@@ -134,6 +150,8 @@ def main():
     for title, kind, src in PROGRAMS:
         if "6b." not in title and "include <iostream>" not in src:
             src = "#include <iostream>" + chr(10) + src   # every program needs <iostream> at the top
+        if kind != "nomain" and "int main" not in src:
+            src = wrap_in_main(src)          # every program needs int main()
         with open(tmp, "w") as f:
             f.write(src)
         tabs, errors, status = [], "", "ok"
