@@ -1,3 +1,4 @@
+// flags: --allow-no-main
 #include <iostream>
 // nested while/if-else, dangling else and logical operators
 int i = 0;

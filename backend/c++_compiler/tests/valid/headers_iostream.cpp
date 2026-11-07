@@ -1,3 +1,4 @@
+// flags: --allow-no-main
 // standard headers, using namespace, cout with endl
 #include <iostream>
 #include <vector>

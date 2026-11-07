@@ -1,3 +1,4 @@
+// flags: --allow-no-main
 // C++ style extras: for loop, ++/--, compound assignment, cout
 #include <iostream>
 using namespace std;

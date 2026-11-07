@@ -1,10 +1,10 @@
 === Headers ===
 Header              Line  Category      Role in this compiler
 ------------------------------------------------------------------------
-<iostream>          2     I/O           enables cout / endl  - std::cout / std::cin streams
-<vector>            3     Containers    accepted (no effect)  - dynamic array
-<cmath>             4     Math          accepted (no effect)  - sqrt, pow, sin, ...
-<cstdlib>           5     C library     accepted (no effect)  - rand, malloc, exit, ...
+<iostream>          3     I/O           enables cout / endl  - std::cout / std::cin streams
+<vector>            4     Containers    accepted (no effect)  - dynamic array
+<cmath>             5     Math          accepted (no effect)  - sqrt, pow, sin, ...
+<cstdlib>           6     C library     accepted (no effect)  - rand, malloc, exit, ...
 === Three Address Code ===
     total = 0
     i = 1

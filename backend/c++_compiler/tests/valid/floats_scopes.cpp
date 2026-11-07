@@ -1,3 +1,4 @@
+// flags: --allow-no-main
 #include <iostream>
 // float arithmetic, mixed int/float, nested scopes and shadowing
 int n = 3;

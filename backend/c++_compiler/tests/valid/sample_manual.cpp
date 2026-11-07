@@ -1,3 +1,4 @@
+// flags: --allow-no-main
 #include <iostream>
 // Sample program from the project manual (section 5.5)
 int x;

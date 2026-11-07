@@ -1,3 +1,4 @@
+// flags: --allow-no-main
 #include <iostream>
 int x;
 bool flag;
