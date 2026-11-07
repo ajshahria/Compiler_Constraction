@@ -110,3 +110,49 @@ This project is intended for educational and university coursework purposes.
 ## Notes
 
 This repository is planned as a simple but functional compiler construction project for academic learning and demonstration.
+
+---
+
+# C++ Compiler (branch `c++_compiler`)
+
+A Flex/Bison compiler written in C++ for the fixed mini language of the lab manual
+(`int`/`float`/`bool`, `if`/`else`, `while`, `print`, nested scopes) plus C++-style extras.
+It implements all six phases and ships a small UI.
+
+## Build and run
+
+```bash
+make                                   # builds build/compiler.exe (needs g++, flex, bison)
+build/compiler.exe examples/sample.cpp # prints TAC (default)
+build/compiler.exe --all examples/sample.cpp
+make test                              # runs every program in tests/ against its .expected file
+python ui/compiler_ui.py               # GUI: editor + one tab per phase
+```
+
+| Flag | Output |
+|---|---|
+| `--tokens` | token stream (phase 1, lexical) |
+| `--ast` | indented AST (phase 2, syntax) |
+| `--symtab` | symbol table: name, type, scope id, line (phase 3, semantic) |
+| `--tac` | three address code (phase 4) — default |
+| `--opt` | optimized TAC (phase 5) |
+| `--asm` / `-o f.s` | 32-bit x86 AT&T assembly (phase 6); build with `gcc f.s -o f.exe` (MinGW) |
+| `--run` | executes the program with the TAC interpreter |
+
+## Phases and files
+
+| Phase | Files |
+|---|---|
+| 1 Lexical analysis | `src/lexer/lexer.l` |
+| 2 Syntax analysis + AST | `src/parser/parser.y`, `src/ast/ast.h`, `src/ast/ast.cpp` |
+| 3 Semantic analysis | `src/semantic/semantic.*`, `src/symbol_table/symbol_table.*` |
+| 4 Intermediate code (TAC) | `src/tac/tac.*` |
+| 5 Optimization (folding, propagation, dead code) | `src/optimizer/optimizer.*` |
+| 6 Code generation | `src/codegen/codegen.*`, `src/codegen/assembly.*`, `src/interpreter/interpreter.*` |
+| Driver / errors | `src/main.cpp`, `src/common/` |
+
+Formal grammar: [`docs/grammar.md`](docs/grammar.md). Test programs: `tests/{valid,lexical,syntax,semantic}`.
+
+## C++ extras (bonus)
+
+`for` loops, `x++`/`x--`, `+= -= *= /=`, and `cout << expr;` — rewritten into core AST nodes by the parser.
