@@ -1,0 +1,2 @@
+Semantic error [line 2]: redeclaration of 'x' in the same scope (first declared at line 1)
+Compilation failed: 1 semantic error(s).
