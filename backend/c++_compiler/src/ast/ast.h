@@ -9,8 +9,9 @@
 #include "types.h"
 
 enum class NodeKind {
-    Program, Block, VarDecl, Assign, If, While, Print,
-    Binary, Unary, IntLit, FloatLit, BoolLit, Ident
+    Program, Block, DeclGroup, VarDecl, Assign, If, While, DoWhile, Break, Continue,
+    Return, Switch, Print, Cout, Cin,
+    Binary, Unary, Ternary, IntLit, FloatLit, BoolLit, Ident
 };
 
 struct Node {
@@ -22,7 +23,8 @@ struct Node {
     virtual void print(std::ostream& os, int indent) const = 0;
 };
 
-// Program and Block both hold a list of statements. A Program is the global scope.
+// Program and Block hold a list of statements. A Program is the global scope.
+// A DeclGroup ('int a, b;') and a switch-case body are statement lists WITHOUT their own scope.
 struct BlockNode : Node {
     std::vector<Node*> stmts;
     BlockNode(NodeKind k, int l) : Node(k, l) {}
@@ -54,16 +56,63 @@ struct IfNode : Node {
     void print(std::ostream& os, int indent) const;
 };
 
+// while loop. 'step' is only used by 'for' loops (runs after the body, and is where 'continue' jumps).
 struct WhileNode : Node {
-    Node *cond, *body;
-    WhileNode(Node* c, Node* b, int l) : Node(NodeKind::While, l), cond(c), body(b) {}
+    Node *cond, *body, *step;
+    WhileNode(Node* c, Node* b, int l, Node* s = NULL)
+        : Node(NodeKind::While, l), cond(c), body(b), step(s) {}
     void print(std::ostream& os, int indent) const;
 };
 
+struct DoWhileNode : Node {
+    Node *body, *cond;
+    DoWhileNode(Node* b, Node* c, int l) : Node(NodeKind::DoWhile, l), body(b), cond(c) {}
+    void print(std::ostream& os, int indent) const;
+};
+
+// 'break;' and 'continue;'
+struct JumpNode : Node {
+    JumpNode(NodeKind k, int l) : Node(k, l) {}
+    void print(std::ostream& os, int indent) const;
+};
+
+struct ReturnNode : Node {
+    Node* value;        // may be null
+    ReturnNode(Node* v, int l) : Node(NodeKind::Return, l), value(v) {}
+    void print(std::ostream& os, int indent) const;
+};
+
+struct SwitchCase {
+    bool isDefault;
+    long value;
+    int line;
+    BlockNode* body;
+};
+
+struct SwitchNode : Node {
+    Node* expr;
+    std::vector<SwitchCase> cases;
+    SwitchNode(Node* e, int l) : Node(NodeKind::Switch, l), expr(e) {}
+    void print(std::ostream& os, int indent) const;
+};
+
+// The manual's 'print e;' (prints the value and a newline)
 struct PrintNode : Node {
     Node* expr;
-    bool viaCout;       // written as 'cout << e' (needs #include <iostream>)
-    PrintNode(Node* e, int l) : Node(NodeKind::Print, l), expr(e), viaCout(false) {}
+    PrintNode(Node* e, int l) : Node(NodeKind::Print, l), expr(e) {}
+    void print(std::ostream& os, int indent) const;
+};
+
+// 'cout << a << "text" << endl;'  One item per '<<'. Needs #include <iostream>.
+struct CoutItem {
+    int kind;           // 0 = expression, 1 = text, 2 = endl
+    Node* expr;
+    std::string text;
+};
+
+struct CoutNode : Node {
+    std::vector<CoutItem> items;
+    CoutNode(int l) : Node(NodeKind::Cout, l) {}
     void print(std::ostream& os, int indent) const;
 };
 
@@ -80,6 +129,13 @@ struct UnaryNode : Node {
     Node* operand;
     UnaryNode(const std::string& o, Node* e, int l)
         : Node(NodeKind::Unary, l), op(o), operand(e) {}
+    void print(std::ostream& os, int indent) const;
+};
+
+// cond ? a : b
+struct TernaryNode : Node {
+    Node *cond, *a, *b;
+    TernaryNode(Node* c, Node* x, Node* y, int l) : Node(NodeKind::Ternary, l), cond(c), a(x), b(y) {}
     void print(std::ostream& os, int indent) const;
 };
 
@@ -104,6 +160,13 @@ struct BoolLitNode : Node {
 struct IdentNode : Node {
     std::string name, uname;
     IdentNode(const std::string& n, int l) : Node(NodeKind::Ident, l), name(n) {}
+    void print(std::ostream& os, int indent) const;
+};
+
+// 'cin >> a >> b;'  Needs #include <iostream>.
+struct CinNode : Node {
+    std::vector<IdentNode*> vars;
+    CinNode(int l) : Node(NodeKind::Cin, l) {}
     void print(std::ostream& os, int indent) const;
 };
 
