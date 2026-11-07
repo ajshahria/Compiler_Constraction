@@ -105,9 +105,10 @@ struct PrintNode : Node {
 
 // 'cout << a << "text" << endl;'  One item per '<<'. Needs #include <iostream>.
 struct CoutItem {
-    int kind;           // 0 = expression, 1 = text, 2 = endl
-    Node* expr;
-    std::string text;
+    int kind;           // 0 = expression, 1 = text, 2 = endl, 3 = (cond ? "text" : "text")
+    Node* expr;         // the value (kind 0) or the condition (kind 3)
+    std::string text;   // the text (kind 1) or the "true" text (kind 3)
+    std::string text2;  // the "false" text (kind 3)
 };
 
 struct CoutNode : Node {

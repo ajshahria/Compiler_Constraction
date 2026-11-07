@@ -98,6 +98,10 @@ void CoutNode::print(std::ostream& os, int indent) const {
     for (size_t i = 0; i < items.size(); i++) {
         if (items[i].kind == 0) items[i].expr->print(os, indent + 1);
         else if (items[i].kind == 1) { pad(os, indent + 1); os << "Text \"" << items[i].text << "\"\n"; }
+        else if (items[i].kind == 3) {
+            pad(os, indent + 1); os << "TextChoice \"" << items[i].text << "\" or \"" << items[i].text2 << "\"\n";
+            items[i].expr->print(os, indent + 2);
+        }
         else { pad(os, indent + 1); os << "Endl\n"; }
     }
 }

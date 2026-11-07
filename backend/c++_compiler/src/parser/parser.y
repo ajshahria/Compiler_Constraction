@@ -283,6 +283,13 @@ cout_list
     | KW_ENDL
         { $$ = new CoutNode(@1.first_line);
           CoutItem it; it.kind = 2; it.expr = NULL; $$->items.push_back(it); }
+    | '(' expr '?' STRING_LIT ':' STRING_LIT ')'
+        { $$ = new CoutNode(@1.first_line);
+          CoutItem it; it.kind = 3; it.expr = $2; it.text = $4; it.text2 = $6;
+          $$->items.push_back(it); free($4); free($6); }
+    | cout_list SHL '(' expr '?' STRING_LIT ':' STRING_LIT ')'
+        { CoutItem it; it.kind = 3; it.expr = $4; it.text = $6; it.text2 = $8;
+          $1->items.push_back(it); free($6); free($8); $$ = $1; }
     | cout_list SHL expr
         { CoutItem it; it.kind = 0; it.expr = $3; $1->items.push_back(it); $$ = $1; }
     | cout_list SHL STRING_LIT
