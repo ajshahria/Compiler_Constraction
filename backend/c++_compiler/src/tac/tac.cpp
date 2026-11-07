@@ -267,6 +267,19 @@ public:
                         i.op = Op::Out; i.a = v; i.ty = v.ty;
                     } else if (c->items[k].kind == 1) {
                         i.op = Op::OutStr; i.label = c->items[k].text;
+                    } else if (c->items[k].kind == 3) {
+                        // (c ? "a" : "b")  ==>  ifFalse c goto Le; outs "a"; goto Lend; Le: outs "b"; Lend:
+                        Operand cond = expr(c->items[k].expr);
+                        std::string lElse = newLabel(), lEnd = newLabel();
+                        emitIfFalse(cond, lElse);
+                        i.op = Op::OutStr; i.label = c->items[k].text;
+                        emit(i);
+                        emitGoto(lEnd);
+                        emitLabel(lElse);
+                        i.label = c->items[k].text2;
+                        emit(i);
+                        emitLabel(lEnd);
+                        continue;
                     } else {
                         i.op = Op::OutNl;
                     }

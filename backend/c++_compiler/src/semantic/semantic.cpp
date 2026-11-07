@@ -265,8 +265,10 @@ static void checkStmt(Node* n) {
         case NodeKind::Cout: {
             CoutNode* c = static_cast<CoutNode*>(n);
             checkIostream(c->line, "cout");
-            for (size_t i = 0; i < c->items.size(); i++)
+            for (size_t i = 0; i < c->items.size(); i++) {
                 if (c->items[i].kind == 0) checkExpr(c->items[i].expr);
+                else if (c->items[i].kind == 3) checkCondition(c->items[i].expr, "?:");
+            }
             break;
         }
         case NodeKind::Cin: {
