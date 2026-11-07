@@ -16,7 +16,7 @@ Value constant(const Operand& o) {
 }
 }
 
-bool interpret(const TacProgram& p, std::ostream& os) {
+bool interpret(const TacProgram& p, std::ostream& os, std::istream& is) {
     std::map<std::string, Value> mem;
     for (size_t i = 0; i < p.vars.size(); i++) {      // every variable starts at 0
         Value v; v.ty = p.vars[i].type;
@@ -46,6 +46,21 @@ bool interpret(const TacProgram& p, std::ostream& os) {
                 if (v.ty == TY_FLOAT) os << v.fv << "\n";
                 else if (v.ty == TY_BOOL) os << (v.iv ? "true" : "false") << "\n";
                 else os << v.iv << "\n";
+                break;
+            }
+            case Op::Out: {   // cout << value (no newline; bool prints as 1/0 like C++)
+                Value v = get(in.a);
+                if (v.ty == TY_FLOAT) os << v.fv; else os << v.iv;
+                break;
+            }
+            case Op::OutStr: os << in.label; break;
+            case Op::OutNl:  os << "\n"; break;
+            case Op::Read: {  // cin >> x
+                Value v = mem[in.result.name];
+                v.ty = in.result.ty;
+                if (v.ty == TY_FLOAT) { double d = 0; if (is >> d) v.fv = d; }
+                else { long x = 0; if (is >> x) v.iv = (v.ty == TY_BOOL) ? (x != 0) : x; }
+                mem[in.result.name] = v;
                 break;
             }
             case Op::Assign: { Value v = get(in.a); v.ty = in.result.ty; mem[in.result.name] = v; break; }

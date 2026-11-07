@@ -2,10 +2,12 @@
 #ifndef INTERPRETER_H
 #define INTERPRETER_H
 
+#include <istream>
 #include <ostream>
 #include "tac.h"
 
-// Runs the program, writing 'print' output to os. Returns false on a runtime error.
-bool interpret(const TacProgram& p, std::ostream& os);
+// Runs the program: output goes to os, 'cin' input comes from is.
+// Returns false on a runtime error.
+bool interpret(const TacProgram& p, std::ostream& os, std::istream& is);
 
 #endif

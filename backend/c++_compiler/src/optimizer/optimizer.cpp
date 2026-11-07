@@ -61,7 +61,8 @@ static bool fold(const Instr& in, Operand& out) {
 }
 
 static bool definesResult(Op op) {
-    return op == Op::Assign || op == Op::Not || op == Op::Neg || op == Op::IntToFloat || isBinaryOp(op);
+    return op == Op::Assign || op == Op::Not || op == Op::Neg || op == Op::IntToFloat ||
+           op == Op::Read || isBinaryOp(op);
 }
 
 // Pass 1: constant propagation + folding + branch simplification, per basic block.
