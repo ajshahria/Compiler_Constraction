@@ -65,7 +65,7 @@ Other files: `src/main.cpp` (driver), `src/common/` (types and error reporting),
 - Input: `cin >> a >> b;` for `int`, `float`/`double` and `bool`
 - Loops: `for`, `while`, `do { ... } while (cond);`, with `break` and `continue`
 - `switch (n) { case 1: ... break; case 2: case 3: ... default: ... }` (int `case` values, fall-through works)
-- `cond ? a : b`
+- `cond ? a : b` for numbers and bools, and `cout << (cond ? "yes" : "no")` for text
 - `return expr;` inside `main` (jumps to the end of the program)
 - Declarations: `int a, b = 2;`, `const int N = 5;`
 - Type names: `double` is treated as `float`, and `long`, `long long`, `short` as `int`
@@ -277,7 +277,7 @@ Makefile
 ## 8. Limitations
 
 - Only the language described in section 2. **Not supported yet:** functions other than `main`, arrays, pointers, `std::string` variables, `char` variables, classes/structs, `unsigned`, `goto`, `#define`. A program using them stops with a syntax error.
-- Text can only be written with `cout`; it cannot be stored in a variable or used inside `?:`.
+- Text can only be written with `cout` (including `cout << (cond ? "yes" : "no")`); it cannot be stored in a variable.
 - `double` has the same precision as `float` in the generated assembly (the interpreter uses full doubles).
 - The assembly targets 32-bit MinGW on Windows. It uses `_main` and `_printf` names, so it will not assemble unchanged on Linux.
 - Other headers are accepted but have no library functions behind them.
