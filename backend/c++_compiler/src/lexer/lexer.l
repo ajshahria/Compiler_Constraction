@@ -163,7 +163,8 @@ LETTER  [A-Za-z_]
     return 0;
 }
 
-[ \t\r\n]+          { /* whitespace: discarded */ }
+\n                  { /* newline: kept separate so '^' (start of line) works for indented #include */ }
+[ \t\r]+            { /* whitespace: discarded */ }
 
 .   {
     g_lastLexErrorLine = yylineno;
