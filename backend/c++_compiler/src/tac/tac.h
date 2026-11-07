@@ -19,7 +19,11 @@ enum class Op {
     Label,         // label:
     Goto,          // goto label
     IfFalse,       // ifFalse a goto label
-    Print          // print a
+    Print,         // print a        (the manual's print: value + newline)
+    Out,           // out a          (cout << a, no newline)
+    OutStr,        // outs "text"    (cout << "text"; text kept in 'label')
+    OutNl,         // outnl          (cout << endl)
+    Read           // read x         (cin >> x)
 };
 
 struct Operand {
