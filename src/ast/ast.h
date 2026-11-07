@@ -62,7 +62,8 @@ struct WhileNode : Node {
 
 struct PrintNode : Node {
     Node* expr;
-    PrintNode(Node* e, int l) : Node(NodeKind::Print, l), expr(e) {}
+    bool viaCout;       // written as 'cout << e' (needs #include <iostream>)
+    PrintNode(Node* e, int l) : Node(NodeKind::Print, l), expr(e), viaCout(false) {}
     void print(std::ostream& os, int indent) const;
 };
 

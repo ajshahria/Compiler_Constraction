@@ -51,7 +51,7 @@ static Node* compound(const char* name, const char* op, Node* rhs, int line) {
 
 %token KW_INT KW_FLOAT KW_BOOL KW_IF KW_ELSE KW_WHILE KW_PRINT KW_TRUE KW_FALSE
 /* C++ extras (bonus) */
-%token KW_FOR KW_COUT SHL INC DEC ADDEQ SUBEQ MULEQ DIVEQ
+%token KW_FOR KW_COUT KW_ENDL SHL INC DEC ADDEQ SUBEQ MULEQ DIVEQ
 %token <ival> INT_LIT
 %token <fval> FLOAT_LIT
 %token <sval> IDENTIFIER
@@ -168,7 +168,9 @@ for_step
 
 print_stmt
     : KW_PRINT expr ';'         { $$ = new PrintNode($2, @1.first_line); }
-    | KW_COUT SHL expr ';'      { $$ = new PrintNode($3, @1.first_line); }
+    | KW_COUT SHL expr ';'      { PrintNode* p = new PrintNode($3, @1.first_line); p->viaCout = true; $$ = p; }
+    | KW_COUT SHL expr SHL KW_ENDL ';'
+                                { PrintNode* p = new PrintNode($3, @1.first_line); p->viaCout = true; $$ = p; }
     ;
 
 expr

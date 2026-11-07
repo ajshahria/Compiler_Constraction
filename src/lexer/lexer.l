@@ -9,6 +9,7 @@
 #include <string>
 #include "ast.h"
 #include "diagnostics.h"
+#include "headers.h"
 #include "parser.tab.h"
 
 int g_dumpTokens = 0;
@@ -47,6 +48,9 @@ LETTER  [A-Za-z_]
 "false"     { TOK(KW_FALSE); }
 "for"       { TOK(KW_FOR); }
 "cout"      { TOK(KW_COUT); }
+"std::cout" { TOK(KW_COUT); }
+"endl"      { TOK(KW_ENDL); }
+"std::endl" { TOK(KW_ENDL); }
 
 {DIGIT}+"."{DIGIT}+  { yylval.fval = atof(yytext); TOK(FLOAT_LIT); }
 {DIGIT}+             { yylval.ival = atol(yytext); TOK(INT_LIT); }
@@ -61,6 +65,21 @@ LETTER  [A-Za-z_]
     yylval.sval = strdup(yytext);
     TOK(IDENTIFIER);
 }
+
+^[ \t]*"#"[ \t]*"include"[ \t]*"<"[^>\n]+">"[ \t]*  {
+    /* #include <name>: take the name between < and > */
+    std::string t(yytext);
+    size_t a = t.find('<'), b = t.find('>');
+    includeHeader(t.substr(a + 1, b - a - 1), true, yylineno);
+}
+
+^[ \t]*"#"[ \t]*"include"[ \t]*\"[^\"\n]+\"[ \t]*  {
+    std::string t(yytext);
+    size_t a = t.find('"'), b = t.rfind('"');
+    includeHeader(t.substr(a + 1, b - a - 1), false, yylineno);
+}
+
+"using"[ \t\r\n]+"namespace"[ \t\r\n]+"std"[ \t]*";"  { /* accepted and ignored */ }
 
 "<<"    { TOK(SHL); }
 "++"    { TOK(INC); }
