@@ -122,6 +122,7 @@ It implements all six phases and ships a small UI.
 ## Build and run
 
 ```bash
+cd backend/c++_compiler                # all C++ compiler files live here
 make                                   # builds build/compiler.exe (needs g++, flex, bison)
 build/compiler.exe examples/sample.cpp # prints TAC (default)
 build/compiler.exe --all examples/sample.cpp
@@ -151,7 +152,7 @@ python ui/compiler_ui.py               # GUI: editor + one tab per phase
 | 6 Code generation | `src/codegen/codegen.*`, `src/codegen/assembly.*`, `src/interpreter/interpreter.*` |
 | Driver / errors | `src/main.cpp`, `src/common/` |
 
-Formal grammar: [`docs/grammar.md`](docs/grammar.md). Test programs: `tests/{valid,lexical,syntax,semantic}`.
+Formal grammar: [`backend/c++_compiler/docs/grammar.md`](backend/c++_compiler/docs/grammar.md). Test programs: `backend/c++_compiler/tests/{valid,lexical,syntax,semantic}`. Full guide: [`README_CPP.md`](backend/c++_compiler/README_CPP.md).
 
 ## C++ extras (bonus)
 
