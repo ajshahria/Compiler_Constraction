@@ -60,7 +60,7 @@ Other files: `src/main.cpp` (driver), `src/common/` (types and error reporting),
 
 **C++ syntax on top of the core** (ordinary beginner C++ programs run, and so does the manual's style):
 
-- `int main() { ... return 0; }` (also `int main(void)` and `void main()`); top-level statements without `main` still work
+- `int main() { ... return 0; }` (also `int main(void)`). **Every program must define `int main()`**, and outside it only variable declarations are allowed, as in real C++
 - Output: `cout << a << "text" << endl;` (also `std::cout`, `'\n'`, `"\n"`). Like real C++, `cout` adds no newline and prints a `bool` as `1`/`0`. The manual's `print x;` still prints the value and a newline, with `true`/`false`.
 - Input: `cin >> a >> b;` for `int`, `float`/`double` and `bool`
 - Loops: `for`, `while`, `do { ... } while (cond);`, with `break` and `continue`
@@ -79,7 +79,15 @@ Other files: `src/main.cpp` (driver), `src/common/` (types and error reporting),
 
 - Every program must start with `#include <iostream>`. Without it the compiler reports `missing required header` on line 1.
 - `#include` lines must be at the top of the file, before any code. A later `#include` is a lexical error.
-- `--allow-no-header` switches the first rule off, so the lab manual's sample (which has no header) can still be compiled.
+- `--allow-no-header` switches the first rule off.
+
+**Main-function rules**
+
+- Without `int main() { ... }` the compiler reports `program has no 'int main()' function`.
+- Statements outside `main` (other than variable declarations) are an error: `statement outside of main()`.
+- `void main()`, `main()` with no type, a second `main`, and a missing `{ }` are each reported.
+- `--allow-no-main` switches these rules off. **`--manual` switches off both the header rule and the main rule**, so the lab manual's sample (no header, no `main`) still compiles:
+  `build/compiler.exe --manual --run examples/sample.cpp`
 
 The formal grammar is in [`docs/grammar.md`](docs/grammar.md).
 
@@ -115,7 +123,7 @@ This creates `build/compiler.exe`. Use `make clean` to start from scratch.
 **Compile a program** (prints Three Address Code by default)
 
 ```bash
-build/compiler.exe examples/sample.cpp
+build/compiler.exe examples/headers_demo.cpp
 ```
 
 **Show a single phase**
@@ -132,16 +140,17 @@ build/compiler.exe examples/sample.cpp
 | `--run` | execute the program with the interpreter |
 | `--all` | everything above |
 | `-o file.s` | write the assembly to a file |
+| `--manual` | do not require `#include <iostream>` or `int main()` (the manual's program style) |
 
 ```bash
-build/compiler.exe --all examples/sample.cpp
+build/compiler.exe --manual --all examples/sample.cpp
 build/compiler.exe --opt --run examples/floats.cpp
 ```
 
 **Make a real executable** (MinGW `gcc` assembles the generated code)
 
 ```bash
-build/compiler.exe -o build/out.s examples/sample.cpp
+build/compiler.exe --manual -o build/out.s examples/sample.cpp
 gcc build/out.s -o build/out.exe
 build/out.exe
 ```
@@ -166,7 +175,7 @@ Runs every program in `tests/` and compares the result with its `.expected` file
 
 ## 5. Example
 
-Input (`examples/sample.cpp`):
+Input (`examples/sample.cpp`, the manual's sample; compile it with `--manual`):
 
 ```cpp
 int x;

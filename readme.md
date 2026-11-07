@@ -124,8 +124,8 @@ It implements all six phases and ships a small UI.
 ```bash
 cd backend/c++_compiler                # all C++ compiler files live here
 make                                   # builds build/compiler.exe (needs g++, flex, bison)
-build/compiler.exe examples/sample.cpp # prints TAC (default)
-build/compiler.exe --all examples/sample.cpp
+build/compiler.exe examples/headers_demo.cpp # prints TAC (default)
+build/compiler.exe --manual --all examples/sample.cpp   # the manual's sample needs --manual
 make test                              # runs every program in tests/ against its .expected file
 python ui/compiler_ui.py               # GUI: editor + one tab per phase
 ```
@@ -164,7 +164,7 @@ The lexer recognises `#include <header>` lines and `using namespace std;` (`src/
 All C++ standard headers (`<iostream>`, `<vector>`, `<cmath>`, `<cstdlib>`, ... up to C++23, plus `<stdio.h>`-style C headers
 and `<bits/stdc++.h>`) are accepted and listed with `--headers`. Rules:
 
-- Every program must start with `#include <iostream>` (error `missing required header` otherwise), and `#include` lines must be at the top of the file. `--allow-no-header` relaxes the first rule.
+- Every program must start with `#include <iostream>` (error `missing required header` otherwise), and `#include` lines must be at the top of the file. `--allow-no-header` relaxes the first rule. Every program must also define `int main()` (error otherwise); `--manual` relaxes both rules for the lab manual sample.
 - `cout << x << endl;` (or `std::cout`) needs `<iostream>`.
 - An unknown header (`<notaheader>`) or a quoted user header (`"file.h"`) is a lexical error with its line number.
 - Other headers are accepted but have no effect, because the language has no library calls yet.
