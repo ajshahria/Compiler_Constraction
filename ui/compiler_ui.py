@@ -15,6 +15,7 @@ COMPILER = os.path.join(ROOT, "build", "compiler.exe")
 
 # tab title -> compiler flag
 PHASES = [
+    ("Headers", "--headers"),
     ("Tokens", "--tokens"),
     ("AST", "--ast"),
     ("Symbol Table", "--symtab"),
@@ -24,7 +25,10 @@ PHASES = [
     ("Output", "--run"),
 ]
 
-SAMPLE = """int x;
+SAMPLE = """#include <iostream>
+using namespace std;
+
+int x;
 int y;
 x = 10;
 y = 0;
@@ -32,7 +36,7 @@ while (x > 0) {
     y = y + x;
     x = x - 1;
 }
-print y;
+cout << y << endl;
 """
 
 
