@@ -1,3 +1,4 @@
+#include <iostream>
 // float arithmetic, mixed int/float, nested scopes and shadowing
 int n = 3;
 float f = 2.5;

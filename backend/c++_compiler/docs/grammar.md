@@ -47,24 +47,43 @@ The `expr` rule is ambiguous as written; Bison resolves it with precedence decla
 ```
 ID        → [A-Za-z_][A-Za-z0-9_]*
 INT_LIT   → [0-9]+
-FLOAT_LIT → [0-9]+ '.' [0-9]+
+FLOAT_LIT → [0-9]+ '.' [0-9]* | '.' [0-9]+ | (either of those or [0-9]+) followed by an optional exponent e[+-]?[0-9]+
+STRING_LIT → "..." | '.'      with the escapes \n \t \r \0 \\ \" \'    (only allowed as a cout item)
 comments  → '//' … end of line   |   '/*' … '*/'     (discarded)
 ```
 
-## C++ extras (bonus)
-
-Rewritten into core nodes by the parser:
+## C++ syntax on top of the core
 
 ```
-simple_assign → ID '=' expr | ID '+=' expr | ID '-=' expr | ID '*=' expr | ID '/=' expr
-              | ID '++' | ID '--'
+stmt          → ... | do_stmt | for_stmt | return_stmt | main_def | switch_stmt
+              | cout_stmt | cin_stmt | 'break' ';' | 'continue' ';'
+main_def      → 'int' 'main' '(' ')' block | 'int' 'main' '(' 'void' ')' block | 'void' 'main' '(' ')' block
+type          → 'int' | 'float' | 'double' | 'bool' | 'long' | 'long' 'long' | 'short'
+decl          → ['const'] type declarators ';'
+declarators   → declarator | declarators ',' declarator
+declarator    → ID | ID '=' expr
+simple_assign → ID '=' expr | ID ('+=' | '-=' | '*=' | '/=') expr | ID '++' | ID '--' | '++' ID | '--' ID
 assign_stmt   → simple_assign ';'
-print_stmt    → 'cout' '<<' expr ';'
+do_stmt       → 'do' stmt 'while' '(' expr ')' ';'
 for_stmt      → 'for' '(' for_init ';' for_cond ';' for_step ')' stmt
 for_init      → ε | simple_assign | type ID '=' expr
 for_cond      → ε | expr                 (ε means true)
 for_step      → ε | simple_assign
+switch_stmt   → 'switch' '(' expr ')' '{' case_list '}'
+case_list     → ε | case_list 'case' case_value ':' stmt_list | case_list 'default' ':' stmt_list
+case_value    → INT_LIT | '-' INT_LIT
+return_stmt   → 'return' ';' | 'return' expr ';'
+cout_stmt     → 'cout' '<<' cout_list ';'
+cout_list     → cout_item | cout_list '<<' cout_item
+cout_item     → expr | STRING_LIT | 'endl'
+cin_stmt      → 'cin' '>>' cin_list ';'
+cin_list      → ID | cin_list '>>' ID
+expr          → ... | expr '?' expr ':' expr        (lowest precedence, right associative)
 ```
+
+`x += e`, `x++` and `++x` are rewritten into `x = x op e`; `for` becomes a `while` node that carries
+the update step, so `continue` runs the step. `cout`, `cin`, `break`, `continue`, `return` and `switch` are
+translated to labels and jumps in the Three Address Code.
 
 ## Error recovery
 

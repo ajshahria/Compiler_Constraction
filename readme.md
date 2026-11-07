@@ -156,7 +156,7 @@ Formal grammar: [`backend/c++_compiler/docs/grammar.md`](backend/c++_compiler/do
 
 ## C++ extras (bonus)
 
-`for` loops, `x++`/`x--`, `+= -= *= /=`, and `cout << expr;` — rewritten into core AST nodes by the parser.
+`int main()`, `cout << "text" << x << endl;`, `cin >>`, `for`, `do-while`, `switch`, `break`/`continue`, `?:`, `x++`, `+=` and more — see `README_CPP.md` for the full list.
 
 ## Header files (`#include`)
 
@@ -164,6 +164,7 @@ The lexer recognises `#include <header>` lines and `using namespace std;` (`src/
 All C++ standard headers (`<iostream>`, `<vector>`, `<cmath>`, `<cstdlib>`, ... up to C++23, plus `<stdio.h>`-style C headers
 and `<bits/stdc++.h>`) are accepted and listed with `--headers`. Rules:
 
-- `<iostream>` is the one that matters: `cout << x << endl;` (or `std::cout`) needs it, otherwise a semantic error is reported.
+- Every program must start with `#include <iostream>` (error `missing required header` otherwise), and `#include` lines must be at the top of the file. `--allow-no-header` relaxes the first rule.
+- `cout << x << endl;` (or `std::cout`) needs `<iostream>`.
 - An unknown header (`<notaheader>`) or a quoted user header (`"file.h"`) is a lexical error with its line number.
 - Other headers are accepted but have no effect, because the language has no library calls yet.

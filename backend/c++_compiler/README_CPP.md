@@ -58,14 +58,28 @@ Other files: `src/main.cpp` (driver), `src/common/` (types and error reporting),
 - Comments: `// ...` and `/* ... */`
 - `int` can be used where `float` is expected (widening). Every other mix is an error.
 
-**C++ extras** (bonus, rewritten into core nodes by the parser):
+**C++ syntax on top of the core** (ordinary beginner C++ programs run, and so does the manual's style):
 
-- `for (int i = 0; i < 5; i++) { ... }`
-- `x++`, `x--`, `x += e`, `x -= e`, `x *= e`, `x /= e`
-- `cout << e;`, `std::cout << e << std::endl;`
+- `int main() { ... return 0; }` (also `int main(void)` and `void main()`); top-level statements without `main` still work
+- Output: `cout << a << "text" << endl;` (also `std::cout`, `'\n'`, `"\n"`). Like real C++, `cout` adds no newline and prints a `bool` as `1`/`0`. The manual's `print x;` still prints the value and a newline, with `true`/`false`.
+- Input: `cin >> a >> b;` for `int`, `float`/`double` and `bool`
+- Loops: `for`, `while`, `do { ... } while (cond);`, with `break` and `continue`
+- `switch (n) { case 1: ... break; case 2: case 3: ... default: ... }` (int `case` values, fall-through works)
+- `cond ? a : b`
+- `return expr;` inside `main` (jumps to the end of the program)
+- Declarations: `int a, b = 2;`, `const int N = 5;`
+- Type names: `double` is treated as `float`, and `long`, `long long`, `short` as `int`
+- Shorthand: `x++`, `x--`, `++x`, `--x`, `x += e`, `x -= e`, `x *= e`, `x /= e`
+- Numbers: `3.14`, `.5`, `2.`, `1e3`; text and character literals with `\n \t \\ \"` escapes (only as `cout` items)
 - `#include <...>` headers and `using namespace std;`
 
 **Headers.** All standard C++ headers (`<iostream>`, `<vector>`, `<cmath>`, ... up to C++23), classic C headers such as `<stdio.h>`, and `<bits/stdc++.h>` are accepted and listed. Only `<iostream>` has an effect: `cout` needs it. An unknown header or a quoted `"file.h"` is a lexical error.
+
+**Header rules**
+
+- Every program must start with `#include <iostream>`. Without it the compiler reports `missing required header` on line 1.
+- `#include` lines must be at the top of the file, before any code. A later `#include` is a lexical error.
+- `--allow-no-header` switches the first rule off, so the lab manual's sample (which has no header) can still be compiled.
 
 The formal grammar is in [`docs/grammar.md`](docs/grammar.md).
 
@@ -253,8 +267,9 @@ Makefile
 
 ## 8. Limitations
 
-- Only the language described in section 2. There are no functions, arrays, strings or `cin` yet.
-- `cout << a << b;` is not supported, only `cout << e;` and `cout << e << endl;`. Each `cout` statement prints on its own line.
+- Only the language described in section 2. **Not supported yet:** functions other than `main`, arrays, pointers, `std::string` variables, `char` variables, classes/structs, `unsigned`, `goto`, `#define`. A program using them stops with a syntax error.
+- Text can only be written with `cout`; it cannot be stored in a variable or used inside `?:`.
+- `double` has the same precision as `float` in the generated assembly (the interpreter uses full doubles).
 - The assembly targets 32-bit MinGW on Windows. It uses `_main` and `_printf` names, so it will not assemble unchanged on Linux.
 - Other headers are accepted but have no library functions behind them.
 - `&&` and `||` evaluate both sides (the language has no side effects, so results are the same).
