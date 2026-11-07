@@ -1,5 +1,7 @@
 === Headers ===
-(no headers included)
+Header              Line  Category      Role in this compiler
+------------------------------------------------------------------------
+<iostream>          1     I/O           enables cout / endl  - std::cout / std::cin streams
 === Three Address Code ===
     x = 10
     y = 0

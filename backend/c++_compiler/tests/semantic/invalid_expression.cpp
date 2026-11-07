@@ -1,3 +1,4 @@
+#include <iostream>
 int a = 1;
 bool b = true;
 bool c = a && b;

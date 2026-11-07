@@ -1,4 +1,6 @@
 === Headers ===
-(no headers included)
-Semantic error [line 2]: redeclaration of 'x' in the same scope (first declared at line 1)
+Header              Line  Category      Role in this compiler
+------------------------------------------------------------------------
+<iostream>          1     I/O           enables cout / endl  - std::cout / std::cin streams
+Semantic error [line 3]: redeclaration of 'x' in the same scope (first declared at line 2)
 Compilation failed: 1 semantic error(s).

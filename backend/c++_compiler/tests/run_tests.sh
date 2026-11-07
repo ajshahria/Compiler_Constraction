@@ -7,7 +7,11 @@ COMPILER=build/compiler.exe
 pass=0; fail=0
 for f in tests/*/*.cpp; do
     exp="${f%.cpp}.expected"
-    actual=$($COMPILER --headers --tac --opt --run "$f" 2>&1)
+    # a test can opt out of the header rule with a first line:  // flags: --allow-no-header
+    extra=$(head -1 "$f" | sed -n 's#^// flags: ##p' | tr -d '\r')
+    # a test can give 'cin' input with a line near the top:  // stdin: 2 5
+    input=$(head -3 "$f" | sed -n 's#^// stdin: ##p' | tr -d '\r')
+    actual=$(echo "$input" | $COMPILER $extra --headers --tac --opt --run "$f" 2>&1)
     if [ "$1" == "--update" ]; then echo "$actual" > "$exp"; continue; fi
     if [ "$actual" == "$(cat "$exp" 2>/dev/null)" ]; then
         pass=$((pass+1)); echo "PASS  $f"

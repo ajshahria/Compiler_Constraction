@@ -1,3 +1,4 @@
+#include <iostream>
 int a;
 {
     int inner = 1;

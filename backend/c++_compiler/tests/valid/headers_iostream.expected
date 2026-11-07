@@ -18,9 +18,11 @@ L1:
     i = t4
     goto L1
 L2:
-    print total
+    out total
+    outnl
     t5 = total + 1
-    print t5
+    out t5
+    outnl
 === Optimized TAC ===
     total = 0
     i = 1
@@ -32,9 +34,11 @@ L1:
     i = i + 1
     goto L1
 L2:
-    print total
+    out total
+    outnl
     t5 = total + 1
-    print t5
+    out t5
+    outnl
 === Program Output ===
 30
 31

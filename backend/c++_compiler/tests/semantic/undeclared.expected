@@ -1,5 +1,7 @@
 === Headers ===
-(no headers included)
-Semantic error [line 2]: undeclared variable 'b'
-Semantic error [line 3]: undeclared variable 'c'
+Header              Line  Category      Role in this compiler
+------------------------------------------------------------------------
+<iostream>          1     I/O           enables cout / endl  - std::cout / std::cin streams
+Semantic error [line 3]: undeclared variable 'b'
+Semantic error [line 4]: undeclared variable 'c'
 Compilation failed: 2 semantic error(s).

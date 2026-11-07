@@ -1,3 +1,4 @@
+#include <iostream>
 int x;
 bool flag;
 x = true;

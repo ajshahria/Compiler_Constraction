@@ -14,7 +14,8 @@ L1:
     i = t3
     goto L1
 L2:
-    print sum
+    out sum
+    outnl
     k = 10
     t4 = k - 3
     k = t4
@@ -22,7 +23,8 @@ L2:
     k = t5
     t6 = k - 1
     k = t6
-    print k
+    out k
+    outnl
 === Optimized TAC ===
     sum = 0
     i = 1
@@ -33,12 +35,14 @@ L1:
     i = i + 1
     goto L1
 L2:
-    print sum
+    out sum
+    outnl
     k = 10
     k = 7
     k = 14
     k = 13
-    print 13
+    out 13
+    outnl
 === Program Output ===
 15
 13
