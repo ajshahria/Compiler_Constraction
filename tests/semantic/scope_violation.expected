@@ -1,2 +1,4 @@
+=== Headers ===
+(no headers included)
 Semantic error [line 6]: scope violation: 'inner' was declared in an inner block (line 3) and is not visible here
 Compilation failed: 1 semantic error(s).

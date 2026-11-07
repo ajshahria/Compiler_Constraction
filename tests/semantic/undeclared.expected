@@ -1,3 +1,5 @@
+=== Headers ===
+(no headers included)
 Semantic error [line 2]: undeclared variable 'b'
 Semantic error [line 3]: undeclared variable 'c'
 Compilation failed: 2 semantic error(s).

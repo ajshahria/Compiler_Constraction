@@ -1,3 +1,5 @@
+=== Headers ===
+(no headers included)
 Semantic error [line 3]: invalid assignment: cannot assign bool to int variable 'x'
 Semantic error [line 4]: invalid assignment: cannot assign int to bool variable 'flag'
 Semantic error [line 6]: invalid assignment: cannot assign bool to int variable 'x'

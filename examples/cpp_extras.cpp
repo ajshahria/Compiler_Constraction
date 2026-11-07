@@ -1,4 +1,7 @@
 // C++ style extras: for loop, ++/--, compound assignment, cout
+#include <iostream>
+using namespace std;
+
 int sum = 0;
 for (int i = 1; i <= 5; i++) {
     sum += i;

@@ -1,3 +1,5 @@
+=== Headers ===
+(no headers included)
 Semantic error [line 3]: invalid operands to '&&': int and bool (logical operators need bool operands)
 Semantic error [line 4]: invalid operand to '!': int (needs bool)
 Semantic error [line 6]: invalid operands to '%': float and int ('%' needs two int operands)

@@ -7,7 +7,7 @@ COMPILER=build/compiler.exe
 pass=0; fail=0
 for f in tests/*/*.cpp; do
     exp="${f%.cpp}.expected"
-    actual=$($COMPILER --tac --opt --run "$f" 2>&1)
+    actual=$($COMPILER --headers --tac --opt --run "$f" 2>&1)
     if [ "$1" == "--update" ]; then echo "$actual" > "$exp"; continue; fi
     if [ "$actual" == "$(cat "$exp" 2>/dev/null)" ]; then
         pass=$((pass+1)); echo "PASS  $f"
