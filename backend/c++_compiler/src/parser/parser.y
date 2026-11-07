@@ -27,6 +27,20 @@ void yyerror(const char* msg);
 
 BlockNode* g_program = NULL;   /* root of the AST, read by main */
 
+/* Facts about 'main' collected while parsing; main.cpp turns them into errors. */
+int   g_mainCount = 0;         /* how many main() definitions were found */
+int   g_secondMainLine = 0;    /* line of the 2nd definition (redefinition error) */
+int   g_mainVoidLine = 0;      /* line of 'void main' (main must return int) */
+Node* g_mainBlock = NULL;      /* the body block of the first main() */
+
+static Node* registerMain(Node* body, int line, bool isVoid) {
+    g_mainCount++;
+    if (g_mainCount == 1) g_mainBlock = body;
+    else if (!g_secondMainLine) g_secondMainLine = line;
+    if (isVoid && !g_mainVoidLine) g_mainVoidLine = line;
+    return body;
+}
+
 /* build  name = name <op> rhs  (used by +=, -=, ++ ...) */
 static Node* compound(const char* name, const char* op, Node* rhs, int line) {
     return new AssignNode(name, new BinaryNode(op, new IdentNode(name, line), rhs, line), line);
@@ -127,9 +141,12 @@ block
 
 /* int main() { ... }  -- the body is an ordinary block */
 main_def
-    : KW_INT KW_MAIN '(' ')' block              { $$ = $5; }
-    | KW_INT KW_MAIN '(' KW_VOID ')' block      { $$ = $6; }
-    | KW_VOID KW_MAIN '(' ')' block             { $$ = $5; }
+    : KW_INT KW_MAIN '(' ')' block              { $$ = registerMain($5, @1.first_line, false); }
+    | KW_INT KW_MAIN '(' KW_VOID ')' block      { $$ = registerMain($6, @1.first_line, false); }
+    | KW_VOID KW_MAIN '(' ')' block             { $$ = registerMain($5, @1.first_line, true); }
+    | KW_MAIN '(' ')' block
+        { reportError(PH_SYNTAX, @1.first_line, "'main' has no return type: write 'int main()'");
+          $$ = registerMain($4, @1.first_line, false); }
     ;
 
 type
