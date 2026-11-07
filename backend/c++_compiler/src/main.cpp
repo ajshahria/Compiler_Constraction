@@ -31,7 +31,8 @@ static void usage() {
         "  --asm      print x86 assembly (phase 6)\n"
         "  --run      execute the program with the TAC interpreter\n"
         "  --all      tokens, ast, symtab, tac, opt, asm and run\n"
-        "  -o <file>  write the assembly to <file>\n";
+        "  -o <file>  write the assembly to <file>\n"
+        "  --allow-no-header  do not require #include <iostream> (manual sample style)\n";
 }
 
 int main(int argc, char** argv) {
@@ -39,6 +40,7 @@ int main(int argc, char** argv) {
     bool wOpt = false, wAsm = false, wRun = false;
     const char* file = NULL;
     const char* asmOut = NULL;
+    bool allowNoHeader = false;
 
     for (int i = 1; i < argc; i++) {
         std::string a = argv[i];
@@ -50,6 +52,7 @@ int main(int argc, char** argv) {
         else if (a == "--opt") wOpt = true;
         else if (a == "--asm") wAsm = true;
         else if (a == "--run") wRun = true;
+        else if (a == "--allow-no-header") allowNoHeader = true;
         else if (a == "--all") wHeaders = wTokens = wAst = wSym = wTac = wOpt = wAsm = wRun = true;
         else if (a == "-o" && i + 1 < argc) { asmOut = argv[++i]; wAsm = true; }
         else if (a == "--help" || a == "-h") { usage(); return 0; }
@@ -66,6 +69,10 @@ int main(int argc, char** argv) {
     if (wTokens) std::cout << "=== Tokens ===\n";
     yyparse();
     fclose(yyin);
+
+    // Every program must include <iostream>, at the top of the file.
+    if (!allowNoHeader && !hasHeader("iostream"))
+        reportError(PH_LEXICAL, 1, "missing required header: add '#include <iostream>' at the top of the file");
 
     if (errorCount(PH_LEXICAL) + errorCount(PH_SYNTAX) > 0) {
         std::cerr << "Compilation failed: " << errorCount(PH_LEXICAL) << " lexical and "
@@ -105,7 +112,7 @@ int main(int argc, char** argv) {
     }
     if (wRun) {
         std::cout << "=== Program Output ===\n";
-        if (!interpret(opt, std::cout)) return 2;
+        if (!interpret(opt, std::cout, std::cin)) return 2;
     }
     return 0;
 }
