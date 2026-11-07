@@ -7,6 +7,7 @@
 #include "ast.h"
 #include "codegen.h"
 #include "diagnostics.h"
+#include "headers.h"
 #include "interpreter.h"
 #include "optimizer.h"
 #include "semantic.h"
@@ -21,6 +22,7 @@ extern BlockNode* g_program;
 static void usage() {
     std::cout <<
         "Usage: compiler [options] <source-file>\n"
+        "  --headers  list the #include headers found (preprocessor step)\n"
         "  --tokens   print the token stream (phase 1)\n"
         "  --ast      print the abstract syntax tree (phase 2)\n"
         "  --symtab   print the symbol table (phase 3)\n"
@@ -33,27 +35,28 @@ static void usage() {
 }
 
 int main(int argc, char** argv) {
-    bool wTokens = false, wAst = false, wSym = false, wTac = false;
+    bool wHeaders = false, wTokens = false, wAst = false, wSym = false, wTac = false;
     bool wOpt = false, wAsm = false, wRun = false;
     const char* file = NULL;
     const char* asmOut = NULL;
 
     for (int i = 1; i < argc; i++) {
         std::string a = argv[i];
-        if (a == "--tokens") wTokens = true;
+        if (a == "--headers") wHeaders = true;
+        else if (a == "--tokens") wTokens = true;
         else if (a == "--ast") wAst = true;
         else if (a == "--symtab") wSym = true;
         else if (a == "--tac") wTac = true;
         else if (a == "--opt") wOpt = true;
         else if (a == "--asm") wAsm = true;
         else if (a == "--run") wRun = true;
-        else if (a == "--all") wTokens = wAst = wSym = wTac = wOpt = wAsm = wRun = true;
+        else if (a == "--all") wHeaders = wTokens = wAst = wSym = wTac = wOpt = wAsm = wRun = true;
         else if (a == "-o" && i + 1 < argc) { asmOut = argv[++i]; wAsm = true; }
         else if (a == "--help" || a == "-h") { usage(); return 0; }
         else file = argv[i];
     }
     if (!file) { usage(); return 1; }
-    if (!(wTokens || wAst || wSym || wTac || wOpt || wAsm || wRun)) wTac = true;
+    if (!(wHeaders || wTokens || wAst || wSym || wTac || wOpt || wAsm || wRun)) wTac = true;
 
     yyin = fopen(file, "r");
     if (!yyin) { std::cerr << "Cannot open file '" << file << "'\n"; return 1; }
@@ -69,6 +72,7 @@ int main(int argc, char** argv) {
                   << errorCount(PH_SYNTAX) << " syntax error(s).\n";
         return 1;
     }
+    if (wHeaders) { std::cout << "=== Headers ===\n"; printHeaders(std::cout); }
     if (wAst) { std::cout << "=== AST ===\n"; g_program->print(std::cout, 0); }
 
     // Phase 3: semantic analysis with the symbol table.

@@ -4,6 +4,7 @@
 // int -> float widening is allowed; every other mixing is an error.
 #include "semantic.h"
 #include "diagnostics.h"
+#include "headers.h"
 #include <sstream>
 
 static SymbolTable* table;
@@ -185,9 +186,13 @@ static void checkStmt(Node* n) {
             checkStmt(w->body);
             break;
         }
-        case NodeKind::Print:
-            checkExpr(static_cast<PrintNode*>(n)->expr);
+        case NodeKind::Print: {
+            PrintNode* p = static_cast<PrintNode*>(n);
+            if (p->viaCout && !hasHeader("iostream"))
+                err(p->line, "'cout' is not declared: add #include <iostream>");
+            checkExpr(p->expr);
             break;
+        }
         default:
             break;
     }
