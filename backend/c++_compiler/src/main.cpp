@@ -18,6 +18,25 @@ extern FILE* yyin;
 extern int yyparse();
 extern int g_dumpTokens;
 extern BlockNode* g_program;
+extern int g_mainCount, g_secondMainLine, g_mainVoidLine;
+extern Node* g_mainBlock;
+
+// A C++ program must define 'int main() { ... }' and may only declare variables outside it.
+static void checkProgramStructure() {
+    if (g_mainCount == 0)
+        reportError(PH_SYNTAX, 1, "program has no 'int main()' function: define 'int main() { ... }'");
+    if (g_secondMainLine)
+        reportError(PH_SYNTAX, g_secondMainLine, "redefinition of 'main'");
+    if (g_mainVoidLine)
+        reportError(PH_SYNTAX, g_mainVoidLine, "'main' must return int, not void");
+    for (size_t i = 0; i < g_program->stmts.size(); i++) {
+        Node* s = g_program->stmts[i];
+        if (s == g_mainBlock) continue;
+        if (s->kind == NodeKind::VarDecl || s->kind == NodeKind::DeclGroup) continue;   // global variables
+        if (s->kind == NodeKind::Block && static_cast<BlockNode*>(s)->stmts.empty()) continue;  // stray ';'
+        reportError(PH_SYNTAX, s->line, "statement outside of main(): only variable declarations are allowed at the top level");
+    }
+}
 
 static void usage() {
     std::cout <<
@@ -32,7 +51,9 @@ static void usage() {
         "  --run      execute the program with the TAC interpreter\n"
         "  --all      tokens, ast, symtab, tac, opt, asm and run\n"
         "  -o <file>  write the assembly to <file>\n"
-        "  --allow-no-header  do not require #include <iostream> (manual sample style)\n";
+        "  --allow-no-header  do not require #include <iostream>\n"
+        "  --allow-no-main    do not require int main() (statements may stand alone)\n"
+        "  --manual   same as both flags above: the lab manual's program style\n";
 }
 
 int main(int argc, char** argv) {
@@ -40,7 +61,7 @@ int main(int argc, char** argv) {
     bool wOpt = false, wAsm = false, wRun = false;
     const char* file = NULL;
     const char* asmOut = NULL;
-    bool allowNoHeader = false;
+    bool allowNoHeader = false, allowNoMain = false;
 
     for (int i = 1; i < argc; i++) {
         std::string a = argv[i];
@@ -53,6 +74,8 @@ int main(int argc, char** argv) {
         else if (a == "--asm") wAsm = true;
         else if (a == "--run") wRun = true;
         else if (a == "--allow-no-header") allowNoHeader = true;
+        else if (a == "--allow-no-main") allowNoMain = true;
+        else if (a == "--manual") allowNoHeader = allowNoMain = true;
         else if (a == "--all") wHeaders = wTokens = wAst = wSym = wTac = wOpt = wAsm = wRun = true;
         else if (a == "-o" && i + 1 < argc) { asmOut = argv[++i]; wAsm = true; }
         else if (a == "--help" || a == "-h") { usage(); return 0; }
@@ -73,6 +96,10 @@ int main(int argc, char** argv) {
     // Every program must include <iostream>, at the top of the file.
     if (!allowNoHeader && !hasHeader("iostream"))
         reportError(PH_LEXICAL, 1, "missing required header: add '#include <iostream>' at the top of the file");
+
+    // Only check the overall shape when the parse itself succeeded (avoids follow-up noise).
+    if (!allowNoMain && errorCount(PH_LEXICAL) + errorCount(PH_SYNTAX) == 0)
+        checkProgramStructure();
 
     if (errorCount(PH_LEXICAL) + errorCount(PH_SYNTAX) > 0) {
         std::cerr << "Compilation failed: " << errorCount(PH_LEXICAL) << " lexical and "
