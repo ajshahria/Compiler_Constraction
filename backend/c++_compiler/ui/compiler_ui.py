@@ -51,6 +51,12 @@ class App(tk.Tk):
         ttk.Button(bar, text="Open...", command=self.open_file).pack(side="left")
         ttk.Button(bar, text="Compile & Run", command=self.compile).pack(side="left", padx=6)
 
+        # input for 'cin >> x;' (one box, values separated by spaces or new lines)
+        box = ttk.LabelFrame(self, text="Program input (for cin)")
+        box.pack(side="bottom", fill="x", padx=6, pady=4)
+        self.stdin = tk.Text(box, height=2, font=("Consolas", 10))
+        self.stdin.pack(fill="x")
+
         panes = ttk.PanedWindow(self, orient="horizontal")
         panes.pack(fill="both", expand=True, padx=6, pady=4)
 
@@ -93,7 +99,13 @@ class App(tk.Tk):
         errors = ""
         try:
             for title, flag in PHASES:
-                r = subprocess.run([COMPILER, flag, path], capture_output=True, text=True)
+                try:
+                    r = subprocess.run([COMPILER, flag, path], input=self.stdin.get("1.0", "end"),
+                                       capture_output=True, text=True, timeout=20)
+                except subprocess.TimeoutExpired:
+                    errors = errors or "Timed out after 20 s (infinite loop?)"
+                    self.show(title, "(timed out)")
+                    continue
                 out = r.stdout
                 # strip the "=== header ===" line the compiler prints
                 out = "\n".join(l for l in out.splitlines() if not l.startswith("==="))
