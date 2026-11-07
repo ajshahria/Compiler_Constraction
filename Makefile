@@ -3,7 +3,7 @@
 CXX      := g++
 CXXFLAGS := -std=gnu++11 -Wall -g
 SRC_DIRS := src src/common src/ast src/symbol_table src/semantic src/tac \
-            src/optimizer src/codegen src/interpreter
+            src/optimizer src/codegen src/interpreter src/preprocessor
 INCLUDES := $(addprefix -I,$(SRC_DIRS)) -Ibuild
 BUILD    := build
 TARGET   := $(BUILD)/compiler.exe
